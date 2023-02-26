@@ -1,13 +1,15 @@
-import apiServices from '../services/apiServices';
+import bookCategoryGroupServices from '../services/bookCategoryGroupServices';
 
-const testAPI = async (req,res) => {
+const handleGetAllGroup = async (req, res) => {
     try {
-        let result = await apiServices.testAPI();
+        let result = await bookCategoryGroupServices.getAllGroup();
+
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
             EM: result.EM
-        }) 
+        })
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -18,4 +20,4 @@ const testAPI = async (req,res) => {
     }
 }
 
-module.exports = {testAPI}
+module.exports = { handleGetAllGroup }

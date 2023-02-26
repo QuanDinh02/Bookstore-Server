@@ -2,7 +2,16 @@ import db from '../models/index';
 
 const testAPI = async () => {
     try {
-        const testData = await db.User.findAll({});
+        const testData = await db.Book.findAll({
+            include: { model: db.Author, attributes: ['id','name'] },
+            attributes: ['id', 'name', 'description'],
+            where: {
+                author: 1
+            },
+            nest: true,
+            raw: true
+        });
+
         if (testData) {
             return {
                 EC: 0,
@@ -17,7 +26,7 @@ const testAPI = async () => {
             }
         }
     } catch (error) {
-        console(error);
+        console.log(error);
         return {
             EC: -2,
             EM: 'Something is wrong on services !',
@@ -26,4 +35,4 @@ const testAPI = async () => {
     }
 }
 
-module.exports = {testAPI}
+module.exports = { testAPI }
