@@ -54,23 +54,42 @@ const getAllBook = async () => {
     }
 }
 
-const getHighlighBook = async () => {
+const getABook = async (bookID) => {
     try {
 
-        const result = await db.Book.findAll({
-            include: {
-                model: db.Author, attributes: ['id', 'name']
+        const bookInfo = await db.Book.findOne({
+            where: {
+                id: bookID
             },
-            attributes: ['id', 'name', 'description', 'image'],
+            include: {
+                model: db.Author, attributes: ['name']
+            },
+            attributes: ['id', 'name', 'description', 'price', 'image'],
             nest: true,
             raw: true
         });
 
-        if (result) {
+        const bookSellingInfo = await db.SellingBook.findOne({
+            where: {
+                book_id: bookID
+            },
+            attributes: ['current_price'],
+            nest: true,
+            raw: true
+        })
+
+        if (bookInfo) {
+            bookInfo.current_price = bookSellingInfo.current_price;
             return {
                 EC: 0,
-                DT: result,
+                DT: bookInfo,
                 EM: 'get highlight book successfully'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: {},
+                EM: 'book is not existed !'
             }
         }
 
@@ -84,4 +103,62 @@ const getHighlighBook = async () => {
     }
 }
 
-module.exports = { postCreateABook, getAllBook, getHighlighBook }
+const getBooksByBookCategory = async (book_category_id) => {
+    try {
+
+        const books = await db.Book.findAll({
+            where: {
+                category: book_category_id
+            },
+            include: [
+                {
+                    model: db.Author, attributes: ['name']
+                },
+                {
+                    model: db.SellingBook, attributes: ['current_price']
+                }
+            ],
+            attributes: ['id', 'name', 'price', 'image','rate'],
+            nest: true,
+            raw: true
+        })
+
+        if(books) {
+            let buildData = books.map(item => {
+                return {
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    current_price: item.SellingBook.current_price,
+                    image: item.image,
+                    rate: item.rate,
+                    author: item.Author.name,
+                }
+            })
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'test'
+            } 
+        } else {
+            return {
+                EC: 0,
+                DT: [],
+                EM: 'test'
+            } 
+        }
+    
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+module.exports = {
+    postCreateABook, getAllBook, getABook, getBooksByBookCategory
+}

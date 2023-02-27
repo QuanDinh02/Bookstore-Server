@@ -5,18 +5,16 @@ const getAllGroup = async () => {
 
     try {
         const book_categories_group = await db.BookCategoryGroup.findAll({
-            attributes: ['id'],
+            attributes: ['id','name'],
             raw: true
         });
 
-        let book_group_arr = book_categories_group.map(item => item.id);
-
-        let result = book_group_arr.map(async (item) => {
+        let result = book_categories_group.map(async (item) => {
 
             let book_categories = await db.BookCategory.findAll({
                 attributes: ['id', 'name'],
                 where: {
-                    category_group: item
+                    category_group: item.id
                 },
                 raw: true
             })
@@ -72,7 +70,8 @@ const getAllGroup = async () => {
             })
 
             let buildData = {
-                group_id: item,
+                group_id: item.id,
+                group_name: item.name,
                 book_categories: book_categories,
                 Authors: _authors,
                 Publishers: _publishers

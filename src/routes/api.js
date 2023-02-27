@@ -14,6 +14,8 @@ const initApiRoute = (app) => {
 
     router.post('/book',upload.single('image'),bookController.handleCreateABook);
     router.get('/book',bookController.handleGetAllBook);
+    router.get('/book/:id',bookController.handleGetABook);
+    router.get('/book/book-category/:id',bookController.handleGetBooksByBookCategory);
 
     router.get('/book-category/group',bookCategoryGroupController.handleGetAllGroup);
 
