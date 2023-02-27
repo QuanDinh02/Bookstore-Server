@@ -8,6 +8,8 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             BookCategory.hasMany(models.Book, { foreignKey: 'category' });
             BookCategory.belongsTo(models.BookCategoryGroup, {foreignKey: 'category_group'});
+            BookCategory.belongsToMany(models.Author, { through: 'Author_BookCategory',foreignKey: 'bookCategory_id' });
+            BookCategory.belongsToMany(models.Publisher, { through: 'BookCategory_Publisher',foreignKey: 'bookCategory_id' });
         }
     }
 

@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
 
         static associate(models) {
             Publisher.hasMany(models.Book, { foreignKey: 'publisher' });
+            Publisher.belongsToMany(models.BookCategory, { through: 'BookCategory_Publisher',foreignKey: 'publisher_id' });
         }
     }
     Publisher.init({
