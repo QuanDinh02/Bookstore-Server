@@ -36,6 +36,9 @@ module.exports = {
             image: {
                 type: Sequelize.STRING
             },
+            rate: {
+                type: Sequelize.INTEGER
+            },
             publishingDay: {
                 type: Sequelize.STRING
             },

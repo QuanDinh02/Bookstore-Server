@@ -98,4 +98,5 @@ const getAllGroup = async () => {
         }
     }
 }
+
 module.exports = { getAllGroup }

@@ -27,11 +27,11 @@ const getAllBook = async () => {
 
         const result = await db.Book.findAll({
             include: [
-                { model: db.Author, attributes: ['id','name'] },
-                { model: db.BookCategory, attributes: ['id','name'] },
-                { model: db.Publisher, attributes: ['id','name'] }
+                { model: db.Author, attributes: ['id', 'name'] },
+                { model: db.BookCategory, attributes: ['id', 'name'] },
+                { model: db.Publisher, attributes: ['id', 'name'] }
             ],
-            attributes: ['id', 'name', 'description','image'],
+            attributes: ['id', 'name', 'description', 'image'],
             nest: true,
             raw: true
         });
@@ -53,4 +53,35 @@ const getAllBook = async () => {
         }
     }
 }
-module.exports = { postCreateABook, getAllBook }
+
+const getHighlighBook = async () => {
+    try {
+
+        const result = await db.Book.findAll({
+            include: {
+                model: db.Author, attributes: ['id', 'name']
+            },
+            attributes: ['id', 'name', 'description', 'image'],
+            nest: true,
+            raw: true
+        });
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: result,
+                EM: 'get highlight book successfully'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+module.exports = { postCreateABook, getAllBook, getHighlighBook }

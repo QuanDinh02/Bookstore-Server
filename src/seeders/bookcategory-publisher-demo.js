@@ -21,6 +21,12 @@ module.exports = {
           publisher_id: 1,
           createdAt: new Date(),
           updatedAt: new Date()
+        },
+        {
+          bookCategory_id: 3,
+          publisher_id: 3,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ]
     );

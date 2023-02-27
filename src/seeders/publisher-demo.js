@@ -13,6 +13,11 @@ module.exports = {
           name: 'Guardian News & Media Ltd',
           createdAt: new Date(),
           updatedAt: new Date()
+        },
+        {
+          name: 'The Japan News',
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ]
     );
