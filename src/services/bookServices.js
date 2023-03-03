@@ -1,4 +1,5 @@
 import db from '../models/index';
+const { Op } = require("sequelize");
 
 const postCreateABook = async (data) => {
     try {
@@ -118,7 +119,8 @@ const getBooksByBookCategory = async (book_category_id) => {
                     model: db.SellingBook, attributes: ['current_price']
                 }
             ],
-            attributes: ['id', 'name', 'price', 'image','rate'],
+            attributes: ['id', 'name', 'description','price', 'image','rate'],
+            limit: 6,
             nest: true,
             raw: true
         })
@@ -128,6 +130,7 @@ const getBooksByBookCategory = async (book_category_id) => {
                 return {
                     id: item.id,
                     name: item.name,
+                    description: item.description,
                     price: item.price,
                     current_price: item.SellingBook.current_price,
                     image: item.image,
@@ -139,13 +142,83 @@ const getBooksByBookCategory = async (book_category_id) => {
             return {
                 EC: 0,
                 DT: buildData,
-                EM: 'test'
+                EM: 'get books successfully'
             } 
         } else {
             return {
                 EC: 0,
                 DT: [],
-                EM: 'test'
+                EM: ''
+            } 
+        }
+    
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const getBooksByBookCategoryGroup = async (group_id) => {
+    try {
+
+        let book_categories = await db.BookCategory.findAll({
+            attributes: ['id'],
+            where: {
+                category_group: group_id
+            },
+            raw: true
+        })
+
+        let book_categories_arr = book_categories.map(item => +item.id);
+
+        const books = await db.Book.findAll({
+            where: {
+                category: {
+                    [Op.in]: book_categories_arr
+                }
+            },
+            include: [
+                {
+                    model: db.Author, attributes: ['name']
+                },
+                {
+                    model: db.SellingBook, attributes: ['current_price']
+                }
+            ],
+            attributes: ['id', 'name', 'description','price', 'image','rate'],
+            limit: 6,
+            nest: true,
+            raw: true
+        })
+
+        if(books) {
+            let buildData = books.map(item => {
+                return {
+                    id: item.id,
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    current_price: item.SellingBook.current_price,
+                    image: item.image,
+                    rate: item.rate,
+                    author: item.Author.name,
+                }
+            })
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'get books successfully'
+            } 
+        } else {
+            return {
+                EC: 0,
+                DT: [],
+                EM: ''
             } 
         }
     
@@ -160,5 +233,6 @@ const getBooksByBookCategory = async (book_category_id) => {
 }
 
 module.exports = {
-    postCreateABook, getAllBook, getABook, getBooksByBookCategory
+    postCreateABook, getAllBook, getABook, 
+    getBooksByBookCategory, getBooksByBookCategoryGroup
 }

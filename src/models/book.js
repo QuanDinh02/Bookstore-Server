@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         pages: DataTypes.STRING,
         volume: DataTypes.STRING,
         format: DataTypes.STRING,
-        image: DataTypes.STRING,
+        image: DataTypes.TEXT('medium'),
         rate: DataTypes.INTEGER,
         publishingDay: DataTypes.STRING,
         publishingCompany: DataTypes.STRING,

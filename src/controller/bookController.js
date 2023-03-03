@@ -99,7 +99,28 @@ const handleGetBooksByBookCategory = async (req,res) => {
     }
 }
 
+const handleGetBooksByBookCategoryGroup = async (req,res) => {
+    try {
+        let id = req.params.id;
+        let result = await bookServices.getBooksByBookCategoryGroup(+id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = { 
     handleCreateABook, handleGetAllBook, handleGetABook,
-    handleGetBooksByBookCategory 
+    handleGetBooksByBookCategory, handleGetBooksByBookCategoryGroup
 }

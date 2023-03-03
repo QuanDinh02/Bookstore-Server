@@ -23,6 +23,16 @@ module.exports = {
           publisher: 1,
           createdAt: new Date(),
           updatedAt: new Date()
+        },
+        {
+          name: 'Naruto',
+          description: 'The Ninja World',
+          price: 20000,
+          author: 1,
+          category: 3,
+          publisher: 1,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ]
     );
