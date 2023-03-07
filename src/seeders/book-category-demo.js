@@ -27,6 +27,12 @@ module.exports = {
                     category_group: 2,
                     createdAt: new Date(),
                     updatedAt: new Date()
+                },
+                {
+                    name: 'Light Novel',
+                    category_group: 3,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
                 }
             ]
         );

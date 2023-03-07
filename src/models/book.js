@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
             Book.belongsTo(models.BookCategory, {foreignKey: 'category'});
             Book.belongsTo(models.Publisher, {foreignKey: 'publisher'});
             Book.hasOne(models.SellingBook, {foreignKey: 'book_id'});
+            Book.belongsToMany(models.User, { through: 'BookComments',foreignKey: 'book_id' });
         }
     }
 

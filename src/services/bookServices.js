@@ -119,13 +119,13 @@ const getBooksByBookCategory = async (book_category_id) => {
                     model: db.SellingBook, attributes: ['current_price']
                 }
             ],
-            attributes: ['id', 'name', 'description','price', 'image','rate'],
+            attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
             limit: 6,
             nest: true,
             raw: true
         })
 
-        if(books) {
+        if (books) {
             let buildData = books.map(item => {
                 return {
                     id: item.id,
@@ -143,15 +143,15 @@ const getBooksByBookCategory = async (book_category_id) => {
                 EC: 0,
                 DT: buildData,
                 EM: 'get books successfully'
-            } 
+            }
         } else {
             return {
                 EC: 0,
                 DT: [],
                 EM: ''
-            } 
+            }
         }
-    
+
     } catch (error) {
         console.log(error);
         return {
@@ -189,13 +189,13 @@ const getBooksByBookCategoryGroup = async (group_id) => {
                     model: db.SellingBook, attributes: ['current_price']
                 }
             ],
-            attributes: ['id', 'name', 'description','price', 'image','rate'],
+            attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
             limit: 6,
             nest: true,
             raw: true
         })
 
-        if(books) {
+        if (books) {
             let buildData = books.map(item => {
                 return {
                     id: item.id,
@@ -213,15 +213,98 @@ const getBooksByBookCategoryGroup = async (group_id) => {
                 EC: 0,
                 DT: buildData,
                 EM: 'get books successfully'
-            } 
+            }
         } else {
             return {
                 EC: 0,
                 DT: [],
                 EM: ''
-            } 
+            }
         }
-    
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const getBookDetail = async (bookID) => {
+    try {
+
+        const bookInfo = await db.Book.findOne({
+            where: {
+                id: bookID
+            },
+            include: [
+                {
+                    model: db.Author, attributes: ['id', 'name']
+                },
+                {
+                    model: db.Publisher, attributes: ['id', 'name']
+                },
+                {
+                    model: db.BookCategory, attributes: ['id', 'name'],
+                    include : {
+                        model: db.BookCategoryGroup, attributes: ['id', 'name']
+                    }
+                }
+            ],
+            attributes: [
+                'id', 'name', 'description', 'price', 'image',
+                'size', 'pages', 'volume', 'format', 'rate', 'publishingDay',
+                'publishingCompany', 'productCode', 'translator','language'
+            ],
+            nest: true,
+            raw: true
+        });
+
+        const bookSellingInfo = await db.SellingBook.findOne({
+            where: {
+                book_id: bookID
+            },
+            attributes: ['current_price', 'quality', 'status'],
+            nest: true,
+            raw: true
+        })
+
+        const comments = await db.BookComments.findAll({
+            where: {
+                book_id: bookID
+            },
+            include: {
+                model: db.User, attributes: ['username', 'image']
+            },
+            attributes: ['id', 'title', 'content', 'time'],
+            nest: true,
+            raw: true
+        });
+
+        if (bookInfo) {
+
+            bookInfo.current_price = bookSellingInfo.current_price;
+            bookInfo.quality = bookSellingInfo.quality;
+            bookInfo.status = bookSellingInfo.status;
+            bookInfo.BookCategoryGroup = {...bookInfo.BookCategory.BookCategoryGroup};
+            delete bookInfo.BookCategory.BookCategoryGroup;
+
+            bookInfo.Comments = comments;
+            return {
+                EC: 0,
+                DT: bookInfo,
+                EM: 'get detailed book successfully'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: [],
+                EM: 'book is not existed !'
+            }
+        }
+
     } catch (error) {
         console.log(error);
         return {
@@ -233,6 +316,7 @@ const getBooksByBookCategoryGroup = async (group_id) => {
 }
 
 module.exports = {
-    postCreateABook, getAllBook, getABook, 
-    getBooksByBookCategory, getBooksByBookCategoryGroup
+    postCreateABook, getAllBook, getABook,
+    getBooksByBookCategory, getBooksByBookCategoryGroup,
+    getBookDetail
 }

@@ -11,6 +11,7 @@ module.exports = {
           author: 2,
           category: 2,
           publisher: 1,
+          rate: 5,
           createdAt: new Date(),
           updatedAt: new Date()
         },
@@ -21,6 +22,7 @@ module.exports = {
           author: 1,
           category: 3,
           publisher: 1,
+          rate: 4,
           createdAt: new Date(),
           updatedAt: new Date()
         },
@@ -31,6 +33,7 @@ module.exports = {
           author: 1,
           category: 3,
           publisher: 1,
+          rate: 5,
           createdAt: new Date(),
           updatedAt: new Date()
         }
