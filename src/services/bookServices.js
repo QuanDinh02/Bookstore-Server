@@ -248,7 +248,7 @@ const getBookDetail = async (bookID) => {
                 },
                 {
                     model: db.BookCategory, attributes: ['id', 'name'],
-                    include : {
+                    include: {
                         model: db.BookCategoryGroup, attributes: ['id', 'name']
                     }
                 }
@@ -256,7 +256,7 @@ const getBookDetail = async (bookID) => {
             attributes: [
                 'id', 'name', 'description', 'price', 'image',
                 'size', 'pages', 'volume', 'format', 'rate', 'publishingDay',
-                'publishingCompany', 'productCode', 'translator','language'
+                'publishingCompany', 'productCode', 'translator', 'language'
             ],
             nest: true,
             raw: true
@@ -271,27 +271,74 @@ const getBookDetail = async (bookID) => {
             raw: true
         })
 
-        const comments = await db.BookComments.findAll({
+        const { count, rows } = await db.BookComments.findAndCountAll({
             where: {
                 book_id: bookID
             },
             include: {
                 model: db.User, attributes: ['username', 'image']
             },
-            attributes: ['id', 'title', 'content', 'time'],
+            attributes: ['id', 'title', 'content', 'time', 'rate'],
             nest: true,
             raw: true
         });
 
         if (bookInfo) {
 
+            let stars = {
+                star_5: {
+                    rate: 0,
+                    percent: 0
+                },
+                star_4: {
+                    rate: 0,
+                    percent: 0
+                },
+                star_3: {
+                    rate: 0,
+                    percent: 0
+                },
+                star_2: {
+                    rate: 0,
+                    percent: 0
+                },
+                star_1: {
+                    rate: 0,
+                    percent: 0
+                }
+            }
+
             bookInfo.current_price = bookSellingInfo.current_price;
             bookInfo.quality = bookSellingInfo.quality;
             bookInfo.status = bookSellingInfo.status;
-            bookInfo.BookCategoryGroup = {...bookInfo.BookCategory.BookCategoryGroup};
+            bookInfo.BookCategoryGroup = { ...bookInfo.BookCategory.BookCategoryGroup };
             delete bookInfo.BookCategory.BookCategoryGroup;
 
-            bookInfo.Comments = comments;
+            let numberOfRatingPeople = 0;
+
+            rows.forEach(element => {
+                if (element.rate !== 0) {
+                    stars[`star_${element.rate}`].rate += 1;
+                    numberOfRatingPeople += 1;
+                }
+            });
+
+            //let maxRate = 0;
+            //let starHaveMaxRate = 5;
+
+            Object.entries(stars).forEach(([key, value],index) => {
+                stars[key].percent += Math.round((value.rate * 100) / numberOfRatingPeople);
+                // if(value.rate > maxRate) {
+                //     maxRate = value.rate;
+                //     starHaveMaxRate = 5-index;
+                // }
+            });
+
+            bookInfo.Comments = rows;
+            bookInfo.TotalComments = count;
+            bookInfo.StarRatings = stars;
+            //bookInfo.maxRatingStar = starHaveMaxRate;
+
             return {
                 EC: 0,
                 DT: bookInfo,
