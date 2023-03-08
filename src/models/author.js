@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     Author.init({
         name: DataTypes.STRING,
-        description: DataTypes.STRING,
+        description: DataTypes.TEXT('medium'),
         image: DataTypes.TEXT('medium')
     }, {
         sequelize,
