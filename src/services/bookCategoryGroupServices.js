@@ -109,7 +109,7 @@ const getAGroup = async (group_id) => {
             raw: true
         });
 
-        
+
         let book_categories = await db.BookCategory.findAll({
             attributes: ['id', 'name'],
             where: {
@@ -191,4 +191,180 @@ const getAGroup = async (group_id) => {
         }
     }
 }
-module.exports = { getAllGroup, getAGroup }
+
+const getCategoryGroupWithPagination = async (limit, page) => {
+    try {
+        if (limit !== 0) {
+            let offSet = (page - 1) * limit;
+
+            const { count, rows } = await db.BookCategoryGroup.findAndCountAll({
+                order: [
+                    ['id','DESC']
+                ],
+                limit: limit,
+                offset: offSet,
+                nest: true,
+                raw: true
+            });
+
+            let totalPages = Math.ceil(count / limit);
+
+            let buildData = {
+                total_pages: totalPages,
+                category_groups: rows
+            }
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'get all book category group successfully'
+            }
+        } else {
+            const result = await db.BookCategoryGroup.findAll({
+                attributes: ['id', 'name'],
+                raw: true
+            });
+
+            return {
+                EC: 0,
+                DT: result,
+                EM: 'get all book category group successfully'
+            }
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const postCreateNewCategoryGroup = async (data) => {
+    try {
+        let { name } = data;
+
+        let categoryGroup = await db.BookCategoryGroup.findAll({
+            where: {
+                name: name
+            },
+            attributes: ['id', 'name'],
+            raw: true
+        })
+
+        if (categoryGroup.length > 0) {
+            return {
+                EC: 1,
+                DT: '',
+                EM: 'book category group has already existed !'
+            }
+
+        } else {
+            const result = await db.BookCategoryGroup.create({
+                name: name
+            });
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'create book category group successfully'
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const putUpdateCategoryGroup = async (data) => {
+    try {
+        let { id, name } = data;
+
+        let result = await db.BookCategoryGroup.update({
+            name: name
+        }, {
+            where: {
+                id: +id
+            }
+        })
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'update book category successfully'
+            }
+
+        } else {
+            return {
+                EC: 1,
+                DT: '',
+                EM: 'update book category failed !'
+            }
+        }
+
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const deleteCategoryGroup = async (group_id) => {
+    try {
+
+        let categories = await db.BookCategory.findAll({
+            where: {
+                category_group: group_id
+            },
+            raw: true
+        });
+
+        if (categories.length === 0) {
+            await db.BookCategoryGroup.destroy({
+                where: {
+                    id: group_id
+                },
+            });
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'delete book category successfully'
+            }
+        } else {
+            return {
+                EC: 1,
+                DT: '',
+                EM: `some book categories references to this group, delete them before remove this group !`
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+module.exports = {
+    getAllGroup, getAGroup, getCategoryGroupWithPagination,
+    postCreateNewCategoryGroup, putUpdateCategoryGroup,
+    deleteCategoryGroup
+}
