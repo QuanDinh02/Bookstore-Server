@@ -3,6 +3,7 @@ import apiController from '../controller/apiController';
 import bookController from '../controller/bookController';
 import bookCategoryGroupController from '../controller/bookCategoryGroupController';
 import bookCategoryController from '../controller/bookCategoryController';
+import authorController from '../controller/authorController';
 
 const router = express.Router();
 const multer  = require('multer')
@@ -32,6 +33,11 @@ const initApiRoute = (app) => {
     router.post('/book-category-group',bookCategoryGroupController.handlePostCategoryGroup);
     router.put('/book-category-group',bookCategoryGroupController.handlePutCategoryGroup);
     router.delete('/book-category-group/:id',bookCategoryGroupController.handleDeleteCategoryGroup);
+
+    router.get('/author',authorController.handleGetAuthorsWithPagination);
+    router.post('/author',upload.single('image'),authorController.handlePostCreateNewAuthor);
+    router.put('/author',upload.single('image'),authorController.handlePutUpdateAuthor);
+    router.delete('/author/:id',authorController.handleDeleteAuthor);
 
     return app.use('/api', router);
 }

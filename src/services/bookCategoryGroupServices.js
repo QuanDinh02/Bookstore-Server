@@ -199,7 +199,7 @@ const getCategoryGroupWithPagination = async (limit, page) => {
 
             const { count, rows } = await db.BookCategoryGroup.findAndCountAll({
                 order: [
-                    ['id','DESC']
+                    ['id', 'DESC']
                 ],
                 limit: limit,
                 offset: offSet,
@@ -247,7 +247,7 @@ const postCreateNewCategoryGroup = async (data) => {
     try {
         let { name } = data;
 
-        let categoryGroup = await db.BookCategoryGroup.findAll({
+        let categoryGroup = await db.BookCategoryGroup.findOne({
             where: {
                 name: name
             },
@@ -255,7 +255,7 @@ const postCreateNewCategoryGroup = async (data) => {
             raw: true
         })
 
-        if (categoryGroup.length > 0) {
+        if (categoryGroup) {
             return {
                 EC: 1,
                 DT: '',
@@ -275,6 +275,7 @@ const postCreateNewCategoryGroup = async (data) => {
                 }
             }
         }
+
     } catch (error) {
         console.log(error);
         return {
