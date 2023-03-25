@@ -4,6 +4,7 @@ import bookController from '../controller/bookController';
 import bookCategoryGroupController from '../controller/bookCategoryGroupController';
 import bookCategoryController from '../controller/bookCategoryController';
 import authorController from '../controller/authorController';
+import publisherController from '../controller/publisherController';
 
 const router = express.Router();
 const multer  = require('multer')
@@ -14,8 +15,13 @@ const initApiRoute = (app) => {
     //router.all('*',controllerHandler);
     router.get('/test',apiController.testAPI);
 
-    router.post('/book',upload.single('image'),bookController.handleCreateABook);
-    router.get('/book',bookController.handleGetAllBook);
+    router.get('/book',bookController.handleGetBooksWithPagination);
+    router.post('/book',upload.single('image'),bookController.handlePostCreateNewBook);
+    router.put('/book',upload.single('image'),bookController.handlePutUpdateBook);
+    router.delete('/book/:id',bookController.handleDeleteBook);
+
+    router.put('/selling-book',bookController.handlePutUpdateSellingBook);
+
     router.get('/book/:id',bookController.handleGetABook);
     router.get('/book/book-category/:id',bookController.handleGetBooksByBookCategory);
     router.get('/book/book-category-group/:id',bookController.handleGetBooksByBookCategoryGroup);
@@ -38,6 +44,11 @@ const initApiRoute = (app) => {
     router.post('/author',upload.single('image'),authorController.handlePostCreateNewAuthor);
     router.put('/author',upload.single('image'),authorController.handlePutUpdateAuthor);
     router.delete('/author/:id',authorController.handleDeleteAuthor);
+
+    router.get('/publisher',publisherController.handleGetPublishersWithPagination);
+    router.post('/publisher',publisherController.handlePostCreateNewPublisher);
+    router.put('/publisher',publisherController.handlePutUpdatePublisher);
+    router.delete('/publisher/:id',publisherController.handleDeletePublisher);
 
     return app.use('/api', router);
 }

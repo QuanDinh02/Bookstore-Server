@@ -1,15 +1,218 @@
 import db from '../models/index';
 const { Op } = require("sequelize");
 
-const postCreateABook = async (data) => {
+//------------------------ADMIN-----------------------
+
+const getBooksWithPagination = async (limit, page) => {
     try {
-        const result = await db.Book.create(data);
+        if (limit !== 0) {
+            let offSet = (page - 1) * limit;
+
+            const { count, rows } = await db.Book.findAndCountAll({
+                include: [
+                    { model: db.Author, attributes: ['id', 'name'] },
+                    { model: db.BookCategory, attributes: ['id', 'name'] },
+                    { model: db.Publisher, attributes: ['id', 'name'] },
+                    { model: db.SellingBook, attributes: ['current_price']}
+                ],
+                attributes: [
+                    'id', 'name', 'description', 'price', 'image',
+                    'size', 'pages', 'volume', 'format', 'rate', 'publishingDay',
+                    'publishingCompany', 'productCode', 'translator', 'language'
+                ],
+                order: [
+                    ['id', 'DESC']
+                ],
+                limit: limit,
+                offset: offSet,
+                nest: true,
+                raw: true
+            });
+
+            let totalPages = Math.ceil(count / limit);
+
+            let buildData = {
+                total_pages: totalPages,
+                books: rows
+            }
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'get all books successfully'
+            }
+        }
+        else {
+            const result = await db.Book.findAll({
+                attributes: ['id', 'name'],
+                raw: true
+            });
+
+            return {
+                EC: 0,
+                DT: result,
+                EM: 'get all books successfully'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const postCreateNewBook = async (data) => {
+    try {
+        let { name } = data;
+
+        let existBook = await db.Book.findOne({
+            where: {
+                name: name
+            },
+            attributes: ['id', 'name'],
+            raw: true
+        })
+
+        if (existBook) {
+            return {
+                EC: 1,
+                DT: '',
+                EM: 'Book name is duplicated !'
+            }
+            
+        } else {
+            const result = await db.Book.create(data);
+
+            await db.SellingBook.create({
+                book_id: +result.dataValues.id,
+                quantity: 0,
+                current_price: +result.dataValues.price,
+                quality: '',
+                status: ''
+            })
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'create book successfully'
+                }
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const putUpdateBook = async (data, checkNewImage) => {
+    try {
+        let { id, name } = data;
+
+        let existBook = await db.Book.findOne({
+            where: {
+                name: name
+            },
+            attributes: ['id', 'name'],
+            raw: true
+        })
+
+        if (existBook && existBook.id !== +id) {
+            return {
+                EC: 1,
+                DT: '',
+                EM: 'book name is duplicated !'
+            }
+        } else {
+            delete data.id;
+            if (checkNewImage) {
+                let result = await db.Book.update(data, {
+                    where: {
+                        id: +id
+                    }
+                })
+
+                if (result) {
+                    return {
+                        EC: 0,
+                        DT: '',
+                        EM: 'update book successfully'
+                    }
+
+                } else {
+                    return {
+                        EC: 1,
+                        DT: '',
+                        EM: 'update book failed !'
+                    }
+                }
+            } else {
+                delete data.image;
+                let result = await db.Book.update(data, {
+                    where: {
+                        id: +id
+                    }
+                })
+
+                if (result) {
+                    return {
+                        EC: 0,
+                        DT: '',
+                        EM: 'update book successfully'
+                    }
+
+                } else {
+                    return {
+                        EC: 1,
+                        DT: '',
+                        EM: 'update book failed !'
+                    }
+                }
+            }
+
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const putUpdateSellingBook = async (data) => {
+    try {
+        let { book_id } = data;
+
+        let result = await db.SellingBook.update(data, {
+            where: {
+                book_id: +book_id
+            }
+        })
 
         if (result) {
             return {
                 EC: 0,
                 DT: '',
-                EM: 'create new book successfully'
+                EM: 'update selling book successfully'
+            }
+
+        } else {
+            return {
+                EC: 1,
+                DT: '',
+                EM: 'update selling book failed !'
             }
         }
 
@@ -23,26 +226,25 @@ const postCreateABook = async (data) => {
     }
 }
 
-const getAllBook = async () => {
+const deleteBook = async (book_id) => {
     try {
 
-        const result = await db.Book.findAll({
-            include: [
-                { model: db.Author, attributes: ['id', 'name'] },
-                { model: db.BookCategory, attributes: ['id', 'name'] },
-                { model: db.Publisher, attributes: ['id', 'name'] }
-            ],
-            attributes: ['id', 'name', 'description', 'image'],
-            nest: true,
-            raw: true
+        await db.Book.destroy({
+            where: {
+                id: book_id
+            },
         });
 
-        if (result) {
-            return {
-                EC: 0,
-                DT: result,
-                EM: 'get all book successfully'
+        await db.SellingBook.destroy({
+            where: {
+                book_id: book_id
             }
+        })
+        
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'delete book successfully'
         }
 
     } catch (error) {
@@ -54,6 +256,8 @@ const getAllBook = async () => {
         }
     }
 }
+
+//-----------------------CUSTOMER---------------------
 
 const getABook = async (bookID) => {
     try {
@@ -326,7 +530,7 @@ const getBookDetail = async (bookID) => {
             //let maxRate = 0;
             //let starHaveMaxRate = 5;
 
-            Object.entries(stars).forEach(([key, value],index) => {
+            Object.entries(stars).forEach(([key, value], index) => {
                 stars[key].percent += Math.round((value.rate * 100) / numberOfRatingPeople);
                 // if(value.rate > maxRate) {
                 //     maxRate = value.rate;
@@ -363,7 +567,7 @@ const getBookDetail = async (bookID) => {
 }
 
 module.exports = {
-    postCreateABook, getAllBook, getABook,
-    getBooksByBookCategory, getBooksByBookCategoryGroup,
-    getBookDetail
+    getABook, getBooksByBookCategory, getBooksByBookCategoryGroup, getBookDetail,
+
+    getBooksWithPagination, postCreateNewBook, putUpdateBook, deleteBook, putUpdateSellingBook
 }

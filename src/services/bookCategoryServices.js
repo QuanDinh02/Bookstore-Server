@@ -2,33 +2,50 @@ import db from '../models/index';
 
 const getBookCategoryWithPagination = async (limit, page) => {
     try {
-        let offSet = (page - 1) * limit;
+        if (limit !== 0) {
+            let offSet = (page - 1) * limit;
 
-        const { count, rows } = await db.BookCategory.findAndCountAll({
-            include: {
-                model: db.BookCategoryGroup, attributes: ['id', 'name']
-            },
-            attributes: ['id', 'name'],
-            order: [
-                ['id','DESC']
-            ],
-            limit: limit,
-            offset: offSet,
-            nest: true,
-            raw: true
-        });
+            const { count, rows } = await db.BookCategory.findAndCountAll({
+                include: {
+                    model: db.BookCategoryGroup, attributes: ['id', 'name']
+                },
+                attributes: ['id', 'name'],
+                order: [
+                    ['id', 'DESC']
+                ],
+                limit: limit,
+                offset: offSet,
+                nest: true,
+                raw: true
+            });
 
-        let totalPages = Math.ceil(count / limit);
+            let totalPages = Math.ceil(count / limit);
 
-        let buildData = {
-            total_pages: totalPages,
-            book_categories: rows
+            let buildData = {
+                total_pages: totalPages,
+                book_categories: rows
+            }
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'get all book category successfully'
+            }
         }
+        else {
+            const result = await db.BookCategory.findAll({
+                attributes: ['id', 'name'],
+                order: [
+                    ['name', 'ASC']
+                ],
+                raw: true
+            });
 
-        return {
-            EC: 0,
-            DT: buildData,
-            EM: 'get all book category successfully'
+            return {
+                EC: 0,
+                DT: result,
+                EM: 'get all book category successfully'
+            }
         }
 
     } catch (error) {
