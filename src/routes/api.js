@@ -20,6 +20,7 @@ const initApiRoute = (app) => {
     router.put('/book',upload.single('image'),bookController.handlePutUpdateBook);
     router.delete('/book/:id',bookController.handleDeleteBook);
 
+    router.get('/selling-book/:book_id',bookController.handleGetSellingBook);
     router.put('/selling-book',bookController.handlePutUpdateSellingBook);
 
     router.get('/book/:id',bookController.handleGetABook);

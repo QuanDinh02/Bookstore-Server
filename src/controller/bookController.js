@@ -24,6 +24,27 @@ const handleGetBooksWithPagination = async (req, res) => {
     }
 }
 
+const handleGetSellingBook = async (req, res) => {
+    try {
+        let book_id = req.params.book_id;
+        let result = await bookServices.getSellingBook(+book_id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const handlePostCreateNewBook = async (req, res) => {
     try {
 
@@ -240,5 +261,5 @@ module.exports = {
     handleGetABook, handleGetBooksByBookCategory, handleGetBooksByBookCategoryGroup, handleGetBookDetail,
 
     handleGetBooksWithPagination, handlePostCreateNewBook, handlePutUpdateBook, handleDeleteBook,
-    handlePutUpdateSellingBook
+    handlePutUpdateSellingBook, handleGetSellingBook
 }

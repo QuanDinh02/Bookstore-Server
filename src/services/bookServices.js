@@ -13,7 +13,7 @@ const getBooksWithPagination = async (limit, page) => {
                     { model: db.Author, attributes: ['id', 'name'] },
                     { model: db.BookCategory, attributes: ['id', 'name'] },
                     { model: db.Publisher, attributes: ['id', 'name'] },
-                    { model: db.SellingBook, attributes: ['current_price']}
+                    { model: db.SellingBook, attributes: ['current_price','quantity','quality','status'] }
                 ],
                 attributes: [
                     'id', 'name', 'description', 'price', 'image',
@@ -83,7 +83,7 @@ const postCreateNewBook = async (data) => {
                 DT: '',
                 EM: 'Book name is duplicated !'
             }
-            
+
         } else {
             const result = await db.Book.create(data);
 
@@ -226,6 +226,42 @@ const putUpdateSellingBook = async (data) => {
     }
 }
 
+const getSellingBook = async (bookID) => {
+    try {
+        const result = await db.SellingBook.findOne({
+            where: {
+                book_id: bookID
+            },
+            attributes: ['current_price','quantity','quality','status'],
+            nest: true,
+            raw: true
+        })
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: result,
+                EM: 'get selling book successfully'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: {},
+                EM: 'selling book is not existed !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+
+}
+
 const deleteBook = async (book_id) => {
     try {
 
@@ -240,7 +276,7 @@ const deleteBook = async (book_id) => {
                 book_id: book_id
             }
         })
-        
+
         return {
             EC: 0,
             DT: '',
@@ -569,5 +605,6 @@ const getBookDetail = async (bookID) => {
 module.exports = {
     getABook, getBooksByBookCategory, getBooksByBookCategoryGroup, getBookDetail,
 
-    getBooksWithPagination, postCreateNewBook, putUpdateBook, deleteBook, putUpdateSellingBook
+    getBooksWithPagination, postCreateNewBook, putUpdateBook, deleteBook, putUpdateSellingBook,
+    getSellingBook
 }
