@@ -18,6 +18,21 @@ module.exports = {
           name: 'Manga',
           createdAt: new Date(),
           updatedAt: new Date()
+        },
+        {
+          name: 'Magazine',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          name: 'Music',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          name: 'Technology',
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ]
     );

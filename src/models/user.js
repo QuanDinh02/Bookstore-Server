@@ -8,6 +8,8 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             User.belongsTo(models.UserGroup, {foreignKey: 'user_group'});
             User.hasMany(models.BookComments, {foreignKey: 'commentor'});
+            User.hasMany(models.Order, {foreignKey: 'customer_id'});
+            User.hasMany(models.UserAddress, {foreignKey: 'user_id'});
         }
     }
 

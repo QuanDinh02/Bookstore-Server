@@ -40,6 +40,15 @@ module.exports = {
                     createdAt: new Date(),
                     updatedAt: new Date()
                 },
+                {
+                    book_id: 5,
+                    quantity: 20,
+                    current_price: 28500,
+                    quality: 'A',
+                    status: 'On sale',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                },
             ]
         );
     },

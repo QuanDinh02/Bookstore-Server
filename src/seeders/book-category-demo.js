@@ -33,6 +33,18 @@ module.exports = {
                     category_group: 3,
                     createdAt: new Date(),
                     updatedAt: new Date()
+                },
+                {
+                    name: 'Science Fiction',
+                    category_group: 1,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                },
+                {
+                    name: 'Stock',
+                    category_group: 2,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
                 }
             ]
         );

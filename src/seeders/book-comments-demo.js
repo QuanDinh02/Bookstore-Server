@@ -23,6 +23,16 @@ module.exports = {
                     book_id: 2,
                     createdAt: new Date(),
                     updatedAt: new Date()
+                },
+                {
+                    title: 'The Best',
+                    content: 'It makes me remember something in out life',
+                    time: '22/01/2023 08:06:15',
+                    rate: 5,
+                    commentor: 2,
+                    book_id: 3,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
                 }
                 
             ]
