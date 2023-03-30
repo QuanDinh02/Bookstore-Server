@@ -12,7 +12,11 @@ const getUsersWithPagination = async (limit, page) => {
                 include: {
                     model: db.UserGroup, attributes: ['id', 'name']
                 },
-                attributes: ['id', 'username', 'email', 'phone', 'image', 'dob', 'gender'],
+                attributes: [
+                    'id', 'fullname','username', 'email', 
+                    'phone','address','image', 'dob', 
+                    'gender','facebook_url','twitter_url'
+                ],
                 limit: limit,
                 offset: offSet,
                 nest: true,
@@ -41,6 +45,60 @@ const getUsersWithPagination = async (limit, page) => {
                 EC: 0,
                 DT: result,
                 EM: 'get all users successfully'
+            }
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const getUserGroups = async (limit, page) => {
+    try {
+        if (limit !== 0) {
+            let offSet = (page - 1) * limit;
+
+            const { count, rows } = await db.UserGroup.findAndCountAll({
+                order: [
+                    ['id', 'DESC']
+                ],
+                attributes: [
+                    'id', 'name'
+                ],
+                limit: limit,
+                offset: offSet,
+                nest: true,
+                raw: true
+            });
+
+            let totalPages = Math.ceil(count / limit);
+
+            let buildData = {
+                total_pages: totalPages,
+                users: rows
+            }
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'get user groups successfully'
+            }
+        } else {
+            const result = await db.UserGroup.findAll({
+                attributes: ['id', 'name'],
+                raw: true
+            });
+
+            return {
+                EC: 0,
+                DT: result,
+                EM: 'get all user groups successfully'
             }
         }
 
@@ -210,5 +268,5 @@ const deleteUser = async (user_id) => {
 
 module.exports = {
     getUsersWithPagination, postCreateNewUser,
-    putUpdateUser, deleteUser
+    putUpdateUser, deleteUser, getUserGroups
 }

@@ -6,6 +6,7 @@ import bookCategoryController from '../controller/bookCategoryController';
 import authorController from '../controller/authorController';
 import publisherController from '../controller/publisherController';
 import userController from '../controller/userController';
+import orderController from '../controller/orderController';
 
 const router = express.Router();
 const multer  = require('multer')
@@ -53,9 +54,20 @@ const initApiRoute = (app) => {
     router.delete('/publisher/:id',publisherController.handleDeletePublisher);
 
     router.get('/user',userController.handleGetUsersWithPagination);
+    router.get('/user/group',userController.handleGetUserGroups);
     router.post('/user',upload.single('image'),userController.handlePostCreateNewUser);
     router.put('/user',upload.single('image'),userController.handlePutUpdateUser);
     router.delete('/user/:id',userController.handleDeleteUser);
+
+    router.get('/order',orderController.handleGetOrdersWithPagination);
+    router.post('/order',orderController.handlePostCreateNewOrder);
+    router.put('/order',orderController.handlePutUpdateOrder);
+    router.delete('/order/:id',orderController.handleDeleteOrder);
+
+    router.get('/order-detail',orderController.handleGetOrderDetail);
+    //router.post('/order-detail/:id',orderController.handleCreateOrderDetail);
+    //router.put('/order-detail/:id',orderController.handleUpdateOrderDetail);
+    //router.delete('/order-detail/:id',orderController.handleDeleteOrderDetail);
 
     return app.use('/api', router);
 }

@@ -9,6 +9,9 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
+            fullname: {
+                type: Sequelize.STRING
+            },
             username: {
                 type: Sequelize.STRING
             },
@@ -16,6 +19,9 @@ module.exports = {
                 type: Sequelize.STRING
             },
             phone: {
+                type: Sequelize.STRING
+            },
+            address: {
                 type: Sequelize.STRING
             },
             password: {
@@ -29,6 +35,12 @@ module.exports = {
             },
             image: {
                 type: Sequelize.TEXT('medium')
+            },
+            facebook_url: {
+                type: Sequelize.STRING
+            },
+            twitter_url: {
+                type: Sequelize.STRING
             },
             point: {
                 type: Sequelize.INTEGER
