@@ -7,6 +7,7 @@ import authorController from '../controller/authorController';
 import publisherController from '../controller/publisherController';
 import userController from '../controller/userController';
 import orderController from '../controller/orderController';
+import {checkUserJWT} from '../middleware/jwt';
 
 const router = express.Router();
 const multer  = require('multer')
@@ -14,7 +15,6 @@ const upload = multer();
 
 const initApiRoute = (app) => {
 
-    //router.all('*',controllerHandler);
     router.get('/test',apiController.testAPI);
 
     router.get('/book',bookController.handleGetBooksWithPagination);
@@ -65,10 +65,13 @@ const initApiRoute = (app) => {
     router.delete('/order/:id',orderController.handleDeleteOrder);
 
     router.get('/order-detail',orderController.handleGetOrderDetail);
-    //router.post('/order-detail/:id',orderController.handleCreateOrderDetail);
+    router.post('/order-detail',orderController.handleCreateOrderDetails);
     //router.put('/order-detail/:id',orderController.handleUpdateOrderDetail);
     //router.delete('/order-detail/:id',orderController.handleDeleteOrderDetail);
 
+    router.post('/login',apiController.handleUserLogin);
+    router.post('/register',apiController.handleCreateUser);
+    router.get('/account',checkUserJWT,apiController.handleFetchAccount);
     return app.use('/api', router);
 }
 

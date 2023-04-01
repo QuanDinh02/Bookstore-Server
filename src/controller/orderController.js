@@ -106,11 +106,11 @@ const handleGetOrderDetail = async (req, res) => {
         })
     }
 }
-const handleCreateOrderDetail = async (req, res) => {
+const handleCreateOrderDetails = async (req, res) => {
     try {
         let data = req.body;
 
-        let result = await orderServices.postCreateNewOrderDetail(data);
+        let result = await orderServices.postCreateNewOrderDetails(data);
 
         return res.status(200).json({
             EC: result.EC,
@@ -174,6 +174,6 @@ module.exports = {
     handleGetOrdersWithPagination, handlePostCreateNewOrder,
     handlePutUpdateOrder, handleDeleteOrder,
 
-    handleGetOrderDetail, handleCreateOrderDetail,
+    handleGetOrderDetail, handleCreateOrderDetails,
     handleUpdateOrderDetail, handleDeleteOrderDetail
 }

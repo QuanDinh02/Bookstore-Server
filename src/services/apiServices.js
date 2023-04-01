@@ -35,4 +35,8 @@ const testAPI = async () => {
     }
 }
 
-module.exports = { testAPI }
+const fetchUserAccount = async () => {
+    return await axios.get(`/api/account`);
+}
+
+module.exports = { testAPI, fetchUserAccount }

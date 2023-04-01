@@ -146,10 +146,14 @@ const postCreateNewOrder = async (data) => {
 
         const result = await db.Order.create(data);
 
+        let response_data = result.get({ plain: true });
+
         if (result) {
             return {
                 EC: 0,
-                DT: '',
+                DT: {
+                    order: response_data
+                },
                 EM: 'Order successfully'
             }
         }
@@ -223,10 +227,10 @@ const deleteOrder = async (order_id) => {
     }
 }
 
-const postCreateNewOrderDetail = async (data) => {
+const postCreateNewOrderDetails = async (data) => {
     try {
 
-        const result = await db.OrderDetail.create(data);
+        const result = await db.OrderDetail.bulkCreate(data);
 
         if (result) {
             return {
@@ -309,6 +313,6 @@ module.exports = {
     getOrdersWithPagination, postCreateNewOrder,
     putUpdateOrder, deleteOrder,
 
-    getOrderDetail, postCreateNewOrderDetail,
+    getOrderDetail, postCreateNewOrderDetails,
     putUpdateOrderDetail, deleteOrderDetail
 }
