@@ -1,4 +1,5 @@
 import db from '../models/index';
+import { checkPassword, hashPassword } from './LoginRegisterServices';
 
 const getUsersWithPagination = async (limit, page) => {
     try {
@@ -13,9 +14,9 @@ const getUsersWithPagination = async (limit, page) => {
                     model: db.UserGroup, attributes: ['id', 'name']
                 },
                 attributes: [
-                    'id', 'fullname','username', 'email', 
-                    'phone','address','image', 'dob', 
-                    'gender','facebook_url','twitter_url'
+                    'id', 'fullname', 'username', 'email',
+                    'phone', 'address', 'image', 'dob',
+                    'gender', 'facebook_url', 'twitter_url'
                 ],
                 limit: limit,
                 offset: offSet,
@@ -266,7 +267,357 @@ const deleteUser = async (user_id) => {
     }
 }
 
+const getUserAddress = async (id) => {
+    try {
+        const result = await db.UserAddress.findAll({
+            where: {
+                user_id: id
+            },
+            attributes: ['id', 'name', 'address', 'phone', 'default'],
+            raw: true
+        });
+
+        return {
+            EC: 0,
+            DT: result,
+            EM: 'get all user addresses successfully'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+const postCreateNewAddress = async (data) => {
+    try {
+
+        const result = await db.UserAddress.create(data);
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'create address successfully'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+const putUpdateAddress = async (data) => {
+    try {
+        let { address_id } = data;
+        delete data.address_id;
+
+        let result = await db.UserAddress.update({
+            name: data.name,
+            phone: data.phone,
+            address: data.address,
+        }, {
+            where: {
+                id: +address_id
+            }
+        })
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'update address successfully'
+            }
+
+        } else {
+            return {
+                EC: 1,
+                DT: '',
+                EM: 'update address failed !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+const setDefaultAddress = async (data) => {
+    try {
+        let { address_id, default_address_id } = data;
+
+        let defaultAddress = await db.UserAddress.update({
+            default: 'FALSE'
+        }, {
+            where: {
+                id: +default_address_id
+            }
+        });
+
+        if (defaultAddress) {
+            delete data.address_id;
+            delete data.default_address_id;
+
+            let result = await db.UserAddress.update({
+                default: 'TRUE'
+            }, {
+                where: {
+                    id: +address_id
+                }
+            })
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'set default address successfully'
+                }
+
+            } else {
+                return {
+                    EC: 1,
+                    DT: '',
+                    EM: 'set default address failed !'
+                }
+            }
+        } else {
+            return {
+                EC: 1,
+                DT: '',
+                EM: 'set default address failed !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+const getDefaultAddress = async (id) => {
+    try {
+        const result = await db.UserAddress.findOne({
+            where: {
+                user_id: id,
+                default: "TRUE"
+            },
+            attributes: ['name', 'address', 'phone', 'default'],
+            raw: true
+        });
+
+        return {
+            EC: 0,
+            DT: result,
+            EM: 'get user default address successfully'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const deleteAddress = async (id) => {
+    try {
+        await db.UserAddress.destroy({
+            where: {
+                id: id
+            },
+        });
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'delete address successfully'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const putUpdatePassword = async (data) => {
+    try {
+        let { user_id, old_password, new_password } = data;
+
+        let user = await db.User.findOne({
+            where: {
+                id: user_id
+            },
+        })
+
+        if (user) {
+            if (checkPassword(old_password, user.get({ plain: true }).password)) {
+                let result = await db.User.update({
+                    password: hashPassword(new_password)
+                }, {
+                    where: {
+                        id: +user_id
+                    }
+                })
+
+                if (result) {
+                    return {
+                        EC: 0,
+                        DT: '',
+                        EM: 'change password successfully'
+                    }
+
+                } else {
+                    return {
+                        EC: 1,
+                        DT: '',
+                        EM: 'change password failed !'
+                    }
+                }
+            }
+            else {
+                return {
+                    EC: 1,
+                    DT: '',
+                    EM: 'Password is incorrect !'
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const getUserProfile = async (id) => {
+    try {
+        const result = await db.User.findOne({
+            where: {
+                id: id
+            },
+            attributes: [
+                'id', 'fullname', 'username',
+                'email', 'phone', 'gender',
+                'dob', 'image'
+            ],
+            raw: true
+        });
+
+        return {
+            EC: 0,
+            DT: result,
+            EM: 'get user profile successfully'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const putUpdateUserProfile = async (data, checkNewImage) => {
+    try {
+        let { id } = data;
+
+        if (checkNewImage) {
+            let result = await db.User.update({
+                fullname: data.fullname,
+                phone: data.phone,
+                dob: data.dob,
+                gender: data.gender,
+                image: data.image
+            }, {
+                where: {
+                    id: +id
+                }
+            })
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'Update profile successfully'
+                }
+
+            } else {
+                return {
+                    EC: 1,
+                    DT: '',
+                    EM: 'Update profile failed !'
+                }
+            }
+        } else {
+            let result = await db.User.update({
+                fullname: data.fullname,
+                phone: data.phone,
+                dob: data.dob,
+                gender: data.gender
+            }, {
+                where: {
+                    id: +id
+                }
+            })
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'Update profile successfully'
+                }
+
+            } else {
+                return {
+                    EC: 1,
+                    DT: '',
+                    EM: 'Update profile failed !'
+                }
+            }
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
 module.exports = {
     getUsersWithPagination, postCreateNewUser,
-    putUpdateUser, deleteUser, getUserGroups
+    putUpdateUser, deleteUser, getUserGroups,
+
+    getUserAddress, postCreateNewAddress,
+    putUpdateAddress, deleteAddress,
+    setDefaultAddress, getDefaultAddress,
+
+    putUpdatePassword, getUserProfile, putUpdateUserProfile
 }

@@ -55,8 +55,11 @@ const initApiRoute = (app) => {
 
     router.get('/user',userController.handleGetUsersWithPagination);
     router.get('/user/group',userController.handleGetUserGroups);
+    router.get('/user/profile/:id',userController.handleGetUserProfile);
+    
     router.post('/user',upload.single('image'),userController.handlePostCreateNewUser);
     router.put('/user',upload.single('image'),userController.handlePutUpdateUser);
+    router.put('/user/profile',upload.single('image'),userController.handleUpdateUserProfile);
     router.delete('/user/:id',userController.handleDeleteUser);
 
     router.get('/order',orderController.handleGetOrdersWithPagination);
@@ -69,9 +72,20 @@ const initApiRoute = (app) => {
     //router.put('/order-detail/:id',orderController.handleUpdateOrderDetail);
     //router.delete('/order-detail/:id',orderController.handleDeleteOrderDetail);
 
+    router.get('/address/:id',userController.handleGetUserAddress);
+    router.get('/address/get-default/:id',userController.handleGetDefaultAddress);
+    router.post('/address',userController.handleCreateNewAddress);
+    router.put('/address',userController.handleUpdateAddress);
+    router.put('/address/set-default',userController.handleSetDefaultAddress);
+    router.delete('/address/:id',userController.handleDeleteAddress);
+    router.put('/password',userController.handleUpdatePassword);
+
     router.post('/login',apiController.handleUserLogin);
     router.post('/register',apiController.handleCreateUser);
     router.get('/account',checkUserJWT,apiController.handleFetchAccount);
+    router.get('/logout',apiController.handleLogoutUser);
+    
+    
     return app.use('/api', router);
 }
 

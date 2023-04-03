@@ -95,4 +95,28 @@ const handleFetchAccount = async (req, res) => {
     })
 }
 
-module.exports = { testAPI, handleUserLogin, handleCreateUser, handleFetchAccount }
+const handleLogoutUser = async (req, res) => {
+
+    try {
+        res.clearCookie("jwt");
+        return res.status(200).json({
+            EC: 0,
+            DT: '',
+            EM: 'Log out successfully'
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+
+}
+
+module.exports = { 
+    testAPI, handleUserLogin, 
+    handleCreateUser, handleFetchAccount,
+    handleLogoutUser
+}

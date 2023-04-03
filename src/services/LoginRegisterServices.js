@@ -145,4 +145,4 @@ const userLogin = async (userData) => {
     }
 }
 
-module.exports = { userRegister, userLogin}
+module.exports = { userRegister, userLogin, checkPassword, hashPassword}
