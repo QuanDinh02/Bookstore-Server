@@ -178,6 +178,7 @@ const putUpdateUser = async (data, checkNewImage) => {
             if (checkNewImage) {
                 let result = await db.User.update({
                     username: data.username,
+                    address: data.address,
                     phone: data.phone,
                     dob: data.dob,
                     gender: data.gender,
@@ -206,6 +207,7 @@ const putUpdateUser = async (data, checkNewImage) => {
             } else {
                 let result = await db.User.update({
                     username: data.username,
+                    address: data.address,
                     phone: data.phone,
                     dob: data.dob,
                     gender: data.gender,

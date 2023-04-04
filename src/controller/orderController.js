@@ -84,12 +84,54 @@ const handleDeleteOrder = async (req, res) => {
         })
     }
 }
+const handlePutUpdateOrderStatus = async (req, res) => {
+    try {
+        let data = req.body;
+
+        let result = await orderServices.putUpdateOrderStatus(data);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
 
 const handleGetOrderDetail = async (req, res) => {
     try {
         let { customer, status } = req.query;
 
         let result = await orderServices.getOrderDetail(+customer, status);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+const handleGetOrderDetailByOrderId = async (req, res) => {
+    try {
+        let id = req.params.id;
+
+        let result = await orderServices.getOrderDetailById(+id);
 
         return res.status(200).json({
             EC: result.EC,
@@ -127,32 +169,12 @@ const handleCreateOrderDetails = async (req, res) => {
         })
     }
 }
-const handleUpdateOrderDetail = async (req, res) => {
+
+const handleDeleteOrderDetail = async (req, res) => {
     try {
         let data = req.body;
 
-        let result = await orderServices.putUpdateOrderDetail(data);
-
-        return res.status(200).json({
-            EC: result.EC,
-            DT: result.DT,
-            EM: result.EM
-        })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            EC: -1,
-            DT: '',
-            EM: "error from server !"
-        })
-    }
-}
-const handleDeleteOrderDetail = async (req, res) => {
-    try {
-        let id = req.params.id;
-
-        let result = await orderServices.deleteOrderDetail(+id);
+        let result = await orderServices.deleteOrderDetail(data);
 
         return res.status(200).json({
             EC: result.EC,
@@ -174,6 +196,7 @@ module.exports = {
     handleGetOrdersWithPagination, handlePostCreateNewOrder,
     handlePutUpdateOrder, handleDeleteOrder,
 
-    handleGetOrderDetail, handleCreateOrderDetails,
-    handleUpdateOrderDetail, handleDeleteOrderDetail
+    handleGetOrderDetail, handleCreateOrderDetails, handleDeleteOrderDetail,
+
+    handleGetOrderDetailByOrderId, handlePutUpdateOrderStatus
 }

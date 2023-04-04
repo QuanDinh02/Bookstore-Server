@@ -68,9 +68,10 @@ const initApiRoute = (app) => {
     router.delete('/order/:id',orderController.handleDeleteOrder);
 
     router.get('/order-detail',orderController.handleGetOrderDetail);
+    router.get('/order-detail/:id',orderController.handleGetOrderDetailByOrderId);
+    router.put('/order-detail',orderController.handlePutUpdateOrderStatus);
     router.post('/order-detail',orderController.handleCreateOrderDetails);
-    //router.put('/order-detail/:id',orderController.handleUpdateOrderDetail);
-    //router.delete('/order-detail/:id',orderController.handleDeleteOrderDetail);
+    router.put('/order-detail-delete',orderController.handleDeleteOrderDetail);
 
     router.get('/address/:id',userController.handleGetUserAddress);
     router.get('/address/get-default/:id',userController.handleGetDefaultAddress);

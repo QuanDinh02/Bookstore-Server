@@ -88,6 +88,9 @@ const getOrderDetail = async (customerId, status) => {
                 where: {
                     customer_id: customerId
                 },
+                order: [
+                    ['id', 'DESC']
+                ],
                 attributes: [
                     'id'
                 ],
@@ -112,6 +115,9 @@ const getOrderDetail = async (customerId, status) => {
                     customer_id: customerId,
                     status: status
                 },
+                order: [
+                    ['id', 'DESC']
+                ],
                 attributes: [
                     'id'
                 ],
@@ -130,7 +136,72 @@ const getOrderDetail = async (customerId, status) => {
                 EM: 'get orders successfully'
             }
         }
-        
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const getOrderDetailById = async (orderID) => {
+    try {
+
+        const order = await db.Order.findOne({
+            where: {
+                id: orderID
+            },
+            include: {
+                model: db.User, attributes: ['id', 'fullname', 'email', 'address', 'phone']
+            },
+            attributes: [
+                'id', 'date', 'status', 'total_price', 'total_books'
+            ],
+            nest: true,
+            raw: true
+        })
+
+        const orderDetails = await db.OrderDetail.findAll({
+            order: [
+                ['id', 'DESC']
+            ],
+            where: {
+                order_id: orderID
+            },
+            include: {
+                model: db.Book, attributes: ['id', 'name', 'image'],
+                include: {
+                    model: db.SellingBook, attributes: ['id', 'current_price']
+                }
+            },
+            attributes: [
+                'id', 'book_amount', 'price'
+            ],
+            nest: true,
+            raw: true
+        });
+
+        if (order) {
+            return {
+                EC: 0,
+                DT: {
+                    order: order,
+                    order_details: orderDetails
+                },
+                EM: 'get orders successfully'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'order is not existed !'
+            }
+        }
+
+
     } catch (error) {
         console.log(error);
         return {
@@ -206,6 +277,12 @@ const putUpdateOrder = async (data) => {
 
 const deleteOrder = async (order_id) => {
     try {
+        await db.OrderDetail.destroy({
+            where: {
+                order_id: order_id
+            }
+        });
+
         await db.Order.destroy({
             where: {
                 id: order_id
@@ -215,6 +292,42 @@ const deleteOrder = async (order_id) => {
             EC: 0,
             DT: '',
             EM: 'delete order successfully'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const putUpdateOrderStatus = async (data) => {
+    try {
+        const { id } = data;
+        delete data.id;
+
+        let result = await db.Order.update(data, {
+            where: {
+                id: +id
+            }
+        })
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Update order status successfully'
+            }
+
+        } else {
+            return {
+                EC: 1,
+                DT: '',
+                EM: 'Update order status failed !'
+            }
         }
 
     } catch (error) {
@@ -250,53 +363,37 @@ const postCreateNewOrderDetails = async (data) => {
     }
 }
 
-const putUpdateOrderDetail = async (data) => {
+const deleteOrderDetail = async (data) => {
     try {
-        const { id } = data;
-        delete data.id;
 
-        let result = await db.OrderDetail.update(data, {
+        let { order, item } = data;
+
+        let result = await db.Order.update({
+            total_price: order.total_price - item.price,
+            total_books: order.total_books - item.amount
+        }, {
             where: {
-                id: +id
+                id: +order.id
             }
         })
 
         if (result) {
+            await db.OrderDetail.destroy({
+                where: {
+                    id: +item.id
+                },
+            });
             return {
                 EC: 0,
                 DT: '',
-                EM: 'update order detail successfully'
+                EM: 'Delete item successfully'
             }
-
         } else {
             return {
                 EC: 1,
                 DT: '',
-                EM: 'update order detail failed !'
+                EM: 'Delete item failed'
             }
-        }
-
-    } catch (error) {
-        console.log(error);
-        return {
-            EC: -2,
-            EM: 'Something is wrong on services !',
-            DT: ''
-        }
-    }
-}
-
-const deleteOrderDetail = async (order_detail_id) => {
-    try {
-        await db.OrderDetail.destroy({
-            where: {
-                id: order_detail_id
-            },
-        });
-        return {
-            EC: 0,
-            DT: '',
-            EM: 'delete order detail successfully'
         }
 
     } catch (error) {
@@ -314,5 +411,7 @@ module.exports = {
     putUpdateOrder, deleteOrder,
 
     getOrderDetail, postCreateNewOrderDetails,
-    putUpdateOrderDetail, deleteOrderDetail
+    deleteOrderDetail,
+
+    getOrderDetailById, putUpdateOrderStatus
 }
