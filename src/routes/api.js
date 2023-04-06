@@ -29,6 +29,8 @@ const initApiRoute = (app) => {
     router.get('/book/book-category/:id',bookController.handleGetBooksByBookCategory);
     router.get('/book/book-category-group/:id',bookController.handleGetBooksByBookCategoryGroup);
     router.get('/book/book-detail/:id',bookController.handleGetBookDetail);
+    router.get('/book/author/:id',bookController.handleGetBooksByAuthor);
+    router.get('/book/publisher/:id',bookController.handleGetBooksByPublisher);
 
     router.get('/book-category/group',bookCategoryGroupController.handleGetAllGroup);
     router.get('/book-category/group/:id',bookCategoryGroupController.handleGetAGroup);

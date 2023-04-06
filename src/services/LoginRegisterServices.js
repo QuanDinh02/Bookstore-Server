@@ -84,26 +84,19 @@ const userLogin = async (userData) => {
                         { email: userData.login },
                         { phone: userData.login }
                     ]
-                }
+                },
+                include: { model: db.UserGroup, attributes: ['name'] }
             })
 
             if(user) {
                 if (checkPassword(userData.password, user.get({ plain: true }).password)) {
-                    
-                    //let group_roles = await getGroupWithRoles(user);
-                    
-                    // let payload = {
-                    //     email: user.email,
-                    //     username: user.email,
-                    //     isAuthenticated: true,
-                    //     groupWithRoles: group_roles
-                    // }
 
                     let payload = {
                         id: user.id,
                         email: user.email,
                         username: user.username,
-                        isAuthenticated: true
+                        isAuthenticated: true,
+                        group: user.UserGroup.name
                     }
 
                     let accessToken = createToken(payload);
@@ -113,14 +106,9 @@ const userLogin = async (userData) => {
                             accessToken: accessToken,
                             id: user.id,
                             email: user.email,
-                            username: user.username
+                            username: user.username,
+                            group: user.UserGroup.name
                         },
-                        // DT: {
-                        //     accessToken: accessToken,
-                        //     groupWithRoles: group_roles,
-                        //     email: user.email,
-                        //     username: user.username
-                        // },
                         EM: 'Login success !'
                     }
                 }

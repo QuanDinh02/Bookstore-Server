@@ -257,9 +257,54 @@ const handleGetBookDetail = async (req, res) => {
     }
 }
 
-module.exports = {
-    handleGetABook, handleGetBooksByBookCategory, handleGetBooksByBookCategoryGroup, handleGetBookDetail,
+const handleGetBooksByAuthor = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let result = await bookServices.getBooksByAuthor(+id);
 
-    handleGetBooksWithPagination, handlePostCreateNewBook, handlePutUpdateBook, handleDeleteBook,
-    handlePutUpdateSellingBook, handleGetSellingBook
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const handleGetBooksByPublisher = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let result = await bookServices.getBooksByPublisher(+id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+module.exports = {
+    handleGetABook, handleGetBooksByBookCategory,
+    handleGetBooksByBookCategoryGroup, handleGetBookDetail,
+
+    handleGetBooksWithPagination, handlePostCreateNewBook,
+    handlePutUpdateBook, handleDeleteBook,
+    handlePutUpdateSellingBook, handleGetSellingBook,
+    handleGetBooksByAuthor, handleGetBooksByPublisher
 }

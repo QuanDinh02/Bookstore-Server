@@ -13,7 +13,7 @@ const getBooksWithPagination = async (limit, page) => {
                     { model: db.Author, attributes: ['id', 'name'] },
                     { model: db.BookCategory, attributes: ['id', 'name'] },
                     { model: db.Publisher, attributes: ['id', 'name'] },
-                    { model: db.SellingBook, attributes: ['current_price','quantity','quality','status'] }
+                    { model: db.SellingBook, attributes: ['current_price', 'quantity', 'quality', 'status'] }
                 ],
                 attributes: [
                     'id', 'name', 'description', 'price', 'image',
@@ -232,7 +232,7 @@ const getSellingBook = async (bookID) => {
             where: {
                 book_id: bookID
             },
-            attributes: ['current_price','quantity','quality','status'],
+            attributes: ['current_price', 'quantity', 'quality', 'status'],
             nest: true,
             raw: true
         })
@@ -602,9 +602,124 @@ const getBookDetail = async (bookID) => {
     }
 }
 
+const getBooksByAuthor = async (author_id) => {
+    try {
+
+        const books = await db.Book.findAll({
+            where: {
+                author: author_id
+            },
+            include: [
+                {
+                    model: db.Author, attributes: ['name']
+                },
+                {
+                    model: db.SellingBook, attributes: ['current_price']
+                }
+            ],
+            attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
+            nest: true,
+            raw: true
+        })
+
+        if (books) {
+            let buildData = books.map(item => {
+                return {
+                    id: item.id,
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    current_price: item.SellingBook.current_price,
+                    image: item.image,
+                    rate: item.rate,
+                    author: item.Author.name,
+                }
+            })
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'get books successfully'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: [],
+                EM: ''
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+const getBooksByPublisher = async (publisher_id) => {
+    try {
+
+        const books = await db.Book.findAll({
+            where: {
+                publisher: publisher_id
+            },
+            include: [
+                {
+                    model: db.Author, attributes: ['name']
+                },
+                {
+                    model: db.SellingBook, attributes: ['current_price']
+                }
+            ],
+            attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
+            nest: true,
+            raw: true
+        })
+
+        if (books) {
+            let buildData = books.map(item => {
+                return {
+                    id: item.id,
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    current_price: item.SellingBook.current_price,
+                    image: item.image,
+                    rate: item.rate,
+                    author: item.Author.name,
+                }
+            })
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'get books successfully'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: [],
+                EM: ''
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
 module.exports = {
     getABook, getBooksByBookCategory, getBooksByBookCategoryGroup, getBookDetail,
 
-    getBooksWithPagination, postCreateNewBook, putUpdateBook, deleteBook, putUpdateSellingBook,
-    getSellingBook
+    getBooksWithPagination, postCreateNewBook, putUpdateBook,
+    deleteBook, putUpdateSellingBook, getSellingBook, getBooksByAuthor,
+    getBooksByPublisher
 }
