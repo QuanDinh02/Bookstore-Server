@@ -1,5 +1,6 @@
 import db from '../models/index';
 import { checkPassword, hashPassword } from './LoginRegisterServices';
+const { Op } = require("sequelize");
 
 const getUsersWithPagination = async (limit, page) => {
     try {
@@ -613,6 +614,62 @@ const putUpdateUserProfile = async (data, checkNewImage) => {
     }
 }
 
+const getDashboardInfo = async (date) => {
+    try {
+        const { count: users_amount } = await db.User.findAndCountAll({
+            raw: true
+        });
+
+        const { count: orders_amount } = await db.Order.findAndCountAll({
+            where: {
+                status: {
+                    [Op.eq]: ['Completed']
+                }
+            },
+            raw: true
+        });
+
+        const { count: books_amount } = await db.Book.findAndCountAll({
+            raw: true
+        });
+
+        const result = await db.Order.findAll({
+            where: {
+                date: date,
+                status: {
+                    [Op.eq]: ['Completed']
+                }
+            },
+            raw: true
+        });
+
+        let today_sales = 0;
+
+        result.forEach(item => {
+            today_sales += item.total_price;
+        });
+
+        return {
+            EC: 0,
+            DT: {
+                users_count: users_amount,
+                orders_count: orders_amount,
+                books_count: books_amount,
+                today_sale: today_sales
+            },
+            EM: 'get dashboard info successfully'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
 module.exports = {
     getUsersWithPagination, postCreateNewUser,
     putUpdateUser, deleteUser, getUserGroups,
@@ -621,5 +678,6 @@ module.exports = {
     putUpdateAddress, deleteAddress,
     setDefaultAddress, getDefaultAddress,
 
-    putUpdatePassword, getUserProfile, putUpdateUserProfile
+    putUpdatePassword, getUserProfile, putUpdateUserProfile,
+    getDashboardInfo
 }

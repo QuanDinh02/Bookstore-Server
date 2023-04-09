@@ -88,7 +88,8 @@ const initApiRoute = (app) => {
     router.get('/account',checkUserJWT,apiController.handleFetchAccount);
     router.get('/logout',apiController.handleLogoutUser);
     
-    
+    router.get('/dashboard',userController.handleGetDashboardInfo);
+
     return app.use('/api', router);
 }
 

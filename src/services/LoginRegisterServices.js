@@ -3,7 +3,7 @@ import db from '../models/index';
 const salt = bcrypt.genSaltSync(10);
 import { Op } from 'sequelize';
 
-import {createToken} from '../middleware/jwt';
+import { createToken } from '../middleware/jwt';
 
 const hashPassword = (password) => {
     return bcrypt.hashSync(password, salt);
@@ -55,7 +55,7 @@ const userRegister = async (userData) => {
             username: userData.username,
             phone: userData.phone,
             password: hash_password,
-            user_group: 2 
+            user_group: 2
         })
 
         return {
@@ -88,7 +88,7 @@ const userLogin = async (userData) => {
                 include: { model: db.UserGroup, attributes: ['name'] }
             })
 
-            if(user) {
+            if (user) {
                 if (checkPassword(userData.password, user.get({ plain: true }).password)) {
 
                     let payload = {
@@ -96,11 +96,11 @@ const userLogin = async (userData) => {
                         email: user.email,
                         username: user.username,
                         isAuthenticated: true,
-                        group: user.UserGroup.name
+                        group: user.UserGroup.name,
                     }
 
                     let accessToken = createToken(payload);
-                    return {    
+                    return {
                         EC: 0,
                         DT: {
                             accessToken: accessToken,
@@ -112,15 +112,15 @@ const userLogin = async (userData) => {
                         EM: 'Login success !'
                     }
                 }
-                
-            } 
+
+            }
         }
-        
+
         return {
             EC: 1,
             DT: '',
             EM: 'Your email/phone or password is incorrect !'
-            
+
         }
 
     } catch (error) {
@@ -133,4 +133,4 @@ const userLogin = async (userData) => {
     }
 }
 
-module.exports = { userRegister, userLogin, checkPassword, hashPassword}
+module.exports = { userRegister, userLogin, checkPassword, hashPassword }

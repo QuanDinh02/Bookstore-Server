@@ -372,6 +372,27 @@ const handleUpdateUserProfile = async (req, res) => {
     }
 }
 
+const handleGetDashboardInfo = async (req, res) => {
+    try {
+        let date = req.query.date;
+        let result = await userServices.getDashboardInfo(date);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     handleGetUsersWithPagination, handlePostCreateNewUser,
     handlePutUpdateUser, handleDeleteUser, handleGetUserGroups,
@@ -380,5 +401,7 @@ module.exports = {
     handleUpdateAddress, handleDeleteAddress,
     handleSetDefaultAddress, handleGetDefaultAddress,
 
-    handleUpdatePassword, handleGetUserProfile, handleUpdateUserProfile
+    handleUpdatePassword, handleGetUserProfile, handleUpdateUserProfile,
+
+    handleGetDashboardInfo
 }
