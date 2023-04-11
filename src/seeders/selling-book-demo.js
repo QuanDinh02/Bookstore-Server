@@ -43,7 +43,7 @@ module.exports = {
                 {
                     book_id: 5,
                     quantity: 20,
-                    current_price: 1850000,
+                    current_price: 185000,
                     quality: 'A',
                     status: 'On sale',
                     createdAt: new Date(),

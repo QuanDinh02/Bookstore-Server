@@ -20,7 +20,7 @@ module.exports = {
                     time: '22/01/2023 08:06:15',
                     rate: 4,
                     commentor: 3,
-                    book_id: 2,
+                    book_id: 1,
                     createdAt: new Date(),
                     updatedAt: new Date()
                 },

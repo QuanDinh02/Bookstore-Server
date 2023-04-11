@@ -1,5 +1,6 @@
 import db from '../models/index';
 const { Op } = require("sequelize");
+import _ from 'lodash';
 
 const getAllGroup = async () => {
 
@@ -21,19 +22,35 @@ const getAllGroup = async () => {
 
             let book_categories_arr = book_categories.map(item => +item.id);
 
+            let books = await db.Book.findAll({
+                where: {
+                    category: {
+                        [Op.in]: book_categories_arr
+                    }
+                },
+                attributes: ['author', 'publisher'],
+                raw: true
+            });
+
+            let author_id_arr = books.map(a => {
+                return a.author;
+            });
+
+            let publisher_id_arr = books.map(a => {
+                return a.publisher;
+            });
+
+            author_id_arr = _.uniq(author_id_arr);
+            publisher_id_arr = _.uniq(publisher_id_arr);
+
             const authors = await db.Author.findAll({
                 attributes: ['id', 'name'],
                 nest: true,
                 group: ['id', 'name'],
-                include: {
-                    model: db.BookCategory,
-                    attributes: ['id', 'name'],
-                    where: {
-                        id: {
-                            [Op.in]: book_categories_arr
-                        }
-                    },
-                    through: { attributes: [] }
+                where: {
+                    id: {
+                        [Op.in]: author_id_arr
+                    }
                 },
                 raw: true
             });
@@ -49,15 +66,10 @@ const getAllGroup = async () => {
                 attributes: ['id', 'name'],
                 nest: true,
                 group: ['id', 'name'],
-                include: {
-                    model: db.BookCategory,
-                    attributes: ['id', 'name'],
-                    where: {
-                        id: {
-                            [Op.in]: book_categories_arr
-                        }
-                    },
-                    through: { attributes: [] }
+                where: {
+                    id: {
+                        [Op.in]: publisher_id_arr
+                    }
                 },
                 raw: true
             });
