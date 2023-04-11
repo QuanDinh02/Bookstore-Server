@@ -5,35 +5,47 @@ module.exports = {
     return queryInterface.bulkInsert('BookCategoryGroup',
       [
         {
-          name: 'Science',
+          id: 1,
+          name: 'Science-Technology',
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          name: 'Economics',
+          id: 2,
+          name: 'Business & Economics',
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          name: 'Manga',
+          id: 3,
+          name: 'Reference',
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          name: 'Magazine',
+          id: 4,
+          name: 'Magazines',
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          name: 'Music',
+          id: 5,
+          name: 'Literature',
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          name: 'Technology',
+          id: 6,
+          name: 'Cook Books',
           createdAt: new Date(),
           updatedAt: new Date()
-        }
+        },
+        {
+          id: 7,
+          name: 'Art & Photography',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
       ]
     );
   },

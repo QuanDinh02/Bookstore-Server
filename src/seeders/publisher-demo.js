@@ -5,23 +5,31 @@ module.exports = {
     return queryInterface.bulkInsert('Publisher',
       [
         {
-          name: 'New York Daily News',
-          description: 'New York',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          name: 'Guardian News & Media Ltd',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          name: 'The Japan News',
+          id: 1,
+          name: 'Alphabooks',
+          description: 'Alphabooks',
           phone: '0901874662',
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
+          id: 2,
+          name: 'Usborne',
+          description: 'Usborne',
+          phone: '0901874663',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 3,
+          name: 'Brown Watson',
+          description: 'Brown Watson',
+          phone: '0901874664',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 4,
           name: 'Pearson',
           description: 'UK',
           phone: '0901357668',
@@ -29,9 +37,34 @@ module.exports = {
           updatedAt: new Date()
         },
         {
+          id: 5,
           name: 'The Reuters',
-          description: 'The United State of America',
-          phone: '33333',
+          description: 'USA',
+          phone: '305059593',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 6,
+          name: 'Parragone',
+          description: 'Parragone',
+          phone: '32124124',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 7,
+          name: 'Bloomsbury',
+          description: 'Bloomsbury',
+          phone: '32124124',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 8,
+          name: 'DK',
+          description: 'DK',
+          phone: '32124124',
           createdAt: new Date(),
           updatedAt: new Date()
         }
