@@ -132,19 +132,35 @@ const getAGroup = async (group_id) => {
 
         let book_categories_arr = book_categories.map(item => +item.id);
 
+        let books = await db.Book.findAll({
+            where: {
+                category: {
+                    [Op.in]: book_categories_arr
+                }
+            },
+            attributes: ['author', 'publisher'],
+            raw: true
+        });
+
+        let author_id_arr = books.map(a => {
+            return a.author;
+        });
+
+        let publisher_id_arr = books.map(a => {
+            return a.publisher;
+        });
+
+        author_id_arr = _.uniq(author_id_arr);
+        publisher_id_arr = _.uniq(publisher_id_arr);
+
         const authors = await db.Author.findAll({
             attributes: ['id', 'name'],
             nest: true,
             group: ['id', 'name'],
-            include: {
-                model: db.BookCategory,
-                attributes: ['id', 'name'],
-                where: {
-                    id: {
-                        [Op.in]: book_categories_arr
-                    }
-                },
-                through: { attributes: [] }
+            where: {
+                id: {
+                    [Op.in]: author_id_arr
+                }
             },
             raw: true
         });
@@ -160,15 +176,10 @@ const getAGroup = async (group_id) => {
             attributes: ['id', 'name'],
             nest: true,
             group: ['id', 'name'],
-            include: {
-                model: db.BookCategory,
-                attributes: ['id', 'name'],
-                where: {
-                    id: {
-                        [Op.in]: book_categories_arr
-                    }
-                },
-                through: { attributes: [] }
+            where: {
+                id: {
+                    [Op.in]: publisher_id_arr
+                }
             },
             raw: true
         });
@@ -179,6 +190,7 @@ const getAGroup = async (group_id) => {
                 name: item.name
             }
         })
+
 
         let buildData = {
             group_id: bookGroup.id,

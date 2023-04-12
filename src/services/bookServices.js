@@ -344,53 +344,110 @@ const getABook = async (bookID) => {
     }
 }
 
-const getBooksByBookCategory = async (book_category_id) => {
+const getBooksByBookCategory = async (book_category_id, book_limit, page) => {
     try {
+        if (book_limit !== 0) {
 
-        const books = await db.Book.findAll({
-            where: {
-                category: book_category_id
-            },
-            include: [
-                {
-                    model: db.Author, attributes: ['name']
+            let offSet = (page - 1) * book_limit;
+
+            const { count, rows: books } = await db.Book.findAndCountAll({
+                where: {
+                    category: book_category_id
                 },
-                {
-                    model: db.SellingBook, attributes: ['current_price']
-                }
-            ],
-            attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
-            limit: 6,
-            nest: true,
-            raw: true
-        })
-
-        if (books) {
-            let buildData = books.map(item => {
-                return {
-                    id: item.id,
-                    name: item.name,
-                    description: item.description,
-                    price: item.price,
-                    current_price: item.SellingBook.current_price,
-                    image: item.image,
-                    rate: item.rate,
-                    author: item.Author.name,
-                }
+                include: [
+                    {
+                        model: db.Author, attributes: ['name']
+                    },
+                    {
+                        model: db.SellingBook, attributes: ['current_price']
+                    }
+                ],
+                attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
+                limit: book_limit,
+                offset: offSet,
+                nest: true,
+                raw: true
             })
 
-            return {
-                EC: 0,
-                DT: buildData,
-                EM: 'get books successfully'
+            let totalPages = Math.ceil(count / book_limit);
+
+            if (books) {
+                let books_data = books.map(item => {
+                    return {
+                        id: item.id,
+                        name: item.name,
+                        description: item.description,
+                        price: item.price,
+                        current_price: item.SellingBook.current_price,
+                        image: item.image,
+                        rate: item.rate,
+                        author: item.Author.name,
+                    }
+                })
+
+                let buildData = {
+                    books_data: books_data,
+                    total_pages: totalPages
+                }
+
+                return {
+                    EC: 0,
+                    DT: buildData,
+                    EM: 'get books successfully'
+                }
+            } else {
+                return {
+                    EC: 0,
+                    DT: [],
+                    EM: ''
+                }
             }
         } else {
-            return {
-                EC: 0,
-                DT: [],
-                EM: ''
+            const books = await db.Book.findAll({
+                where: {
+                    category: book_category_id
+                },
+                include: [
+                    {
+                        model: db.Author, attributes: ['name']
+                    },
+                    {
+                        model: db.SellingBook, attributes: ['current_price']
+                    }
+                ],
+                attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
+                nest: true,
+                raw: true
+            })
+
+            if (books) {
+                let buildData = books.map(item => {
+                    return {
+                        id: item.id,
+                        name: item.name,
+                        description: item.description,
+                        price: item.price,
+                        current_price: item.SellingBook.current_price,
+                        image: item.image,
+                        rate: item.rate,
+                        author: item.Author.name,
+                    }
+                })
+
+                return {
+                    EC: 0,
+                    DT: buildData,
+                    EM: 'get books successfully'
+                }
+            } else {
+                return {
+                    EC: 0,
+                    DT: [],
+                    EM: ''
+                }
             }
         }
+
 
     } catch (error) {
         console.log(error);
@@ -402,8 +459,9 @@ const getBooksByBookCategory = async (book_category_id) => {
     }
 }
 
-const getBooksByBookCategoryGroup = async (group_id) => {
+const getBooksByBookCategoryGroup = async (group_id, book_limit, page) => {
     try {
+        let offSet = (page - 1) * book_limit;
 
         let book_categories = await db.BookCategory.findAll({
             attributes: ['id'],
@@ -415,7 +473,7 @@ const getBooksByBookCategoryGroup = async (group_id) => {
 
         let book_categories_arr = book_categories.map(item => +item.id);
 
-        const books = await db.Book.findAll({
+        const { count, rows: books } = await db.Book.findAndCountAll({
             where: {
                 category: {
                     [Op.in]: book_categories_arr
@@ -430,13 +488,16 @@ const getBooksByBookCategoryGroup = async (group_id) => {
                 }
             ],
             attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
-            limit: 6,
+            limit: book_limit,
+            offset: offSet,
             nest: true,
             raw: true
         })
 
+        let totalPages = Math.ceil(count / book_limit);
+
         if (books) {
-            let buildData = books.map(item => {
+            let books_data = books.map(item => {
                 return {
                     id: item.id,
                     name: item.name,
@@ -448,6 +509,11 @@ const getBooksByBookCategoryGroup = async (group_id) => {
                     author: item.Author.name,
                 }
             })
+
+            let buildData = {
+                books_data: books_data,
+                total_pages: totalPages
+            }
 
             return {
                 EC: 0,
@@ -602,10 +668,12 @@ const getBookDetail = async (bookID) => {
     }
 }
 
-const getBooksByAuthor = async (author_id) => {
+const getBooksByAuthor = async (author_id, book_limit, page) => {
     try {
 
-        const books = await db.Book.findAll({
+        let offSet = (page - 1) * book_limit;
+
+        const { count, rows: books } = await db.Book.findAndCountAll({
             where: {
                 author: author_id
             },
@@ -618,12 +686,16 @@ const getBooksByAuthor = async (author_id) => {
                 }
             ],
             attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
+            limit: book_limit,
+            offset: offSet,
             nest: true,
             raw: true
         })
 
+        let totalPages = Math.ceil(count / book_limit);
+
         if (books) {
-            let buildData = books.map(item => {
+            let books_data = books.map(item => {
                 return {
                     id: item.id,
                     name: item.name,
@@ -635,6 +707,11 @@ const getBooksByAuthor = async (author_id) => {
                     author: item.Author.name,
                 }
             })
+
+            let buildData = {
+                books_data: books_data,
+                total_pages: totalPages
+            }
 
             return {
                 EC: 0,
@@ -659,10 +736,11 @@ const getBooksByAuthor = async (author_id) => {
     }
 }
 
-const getBooksByPublisher = async (publisher_id) => {
+const getBooksByPublisher = async (publisher_id, book_limit, page) => {
     try {
+        let offSet = (page - 1) * book_limit;
 
-        const books = await db.Book.findAll({
+        const { count, rows: books } = await db.Book.findAndCountAll({
             where: {
                 publisher: publisher_id
             },
@@ -675,12 +753,16 @@ const getBooksByPublisher = async (publisher_id) => {
                 }
             ],
             attributes: ['id', 'name', 'description', 'price', 'image', 'rate'],
+            limit: book_limit,
+            offset: offSet,
             nest: true,
             raw: true
         })
 
+        let totalPages = Math.ceil(count / book_limit);
+
         if (books) {
-            let buildData = books.map(item => {
+            let books_data = books.map(item => {
                 return {
                     id: item.id,
                     name: item.name,
@@ -692,6 +774,11 @@ const getBooksByPublisher = async (publisher_id) => {
                     author: item.Author.name,
                 }
             })
+
+            let buildData = {
+                books_data: books_data,
+                total_pages: totalPages
+            }
 
             return {
                 EC: 0,

@@ -196,8 +196,10 @@ const handleGetABook = async (req, res) => {
 
 const handleGetBooksByBookCategory = async (req, res) => {
     try {
-        let id = req.params.id;
-        let result = await bookServices.getBooksByBookCategory(+id);
+
+        let { id, limit, page } = req.query;
+
+        let result = await bookServices.getBooksByBookCategory(+id, +limit, +page);
 
         return res.status(200).json({
             EC: result.EC,
@@ -217,8 +219,9 @@ const handleGetBooksByBookCategory = async (req, res) => {
 
 const handleGetBooksByBookCategoryGroup = async (req, res) => {
     try {
-        let id = req.params.id;
-        let result = await bookServices.getBooksByBookCategoryGroup(+id);
+        let { id, limit, page } = req.query;
+
+        let result = await bookServices.getBooksByBookCategoryGroup(+id, +limit, +page);
 
         return res.status(200).json({
             EC: result.EC,
@@ -259,8 +262,9 @@ const handleGetBookDetail = async (req, res) => {
 
 const handleGetBooksByAuthor = async (req, res) => {
     try {
-        let id = req.params.id;
-        let result = await bookServices.getBooksByAuthor(+id);
+        let { id, limit, page } = req.query;
+
+        let result = await bookServices.getBooksByAuthor(+id, +limit, +page);
 
         return res.status(200).json({
             EC: result.EC,
@@ -280,8 +284,9 @@ const handleGetBooksByAuthor = async (req, res) => {
 
 const handleGetBooksByPublisher = async (req, res) => {
     try {
-        let id = req.params.id;
-        let result = await bookServices.getBooksByPublisher(+id);
+        let { id, limit, page } = req.query;
+
+        let result = await bookServices.getBooksByPublisher(+id, +limit, +page);
 
         return res.status(200).json({
             EC: result.EC,
