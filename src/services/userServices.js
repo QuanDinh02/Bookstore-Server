@@ -298,13 +298,32 @@ const getUserAddress = async (id) => {
 const postCreateNewAddress = async (data) => {
     try {
 
-        const result = await db.UserAddress.create(data);
+        const user_address_arr = await db.UserAddress.findAll({
+            where: {
+                user_id: data.user_id
+            },
+            raw: true
+        });
 
-        if (result) {
-            return {
-                EC: 0,
-                DT: '',
-                EM: 'create address successfully'
+        if (user_address_arr.length > 0) {
+            const result = await db.UserAddress.create(data);
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'create address successfully'
+                }
+            }
+        } else {
+            const result = await db.UserAddress.create({ ...data, default: 'TRUE' });
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'create address successfully'
+                }
             }
         }
 
