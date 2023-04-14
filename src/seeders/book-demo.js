@@ -78,8 +78,8 @@ module.exports = {
         },
         {
           id: 7,
-          name: 'How to avoid a climate disaster',
-          description: 'How to avoid a climate disaster',
+          name: 'How to avoid a tornado',
+          description: 'How to avoid a tornado',
           price: 336000,
           author: 2,
           category: 2,

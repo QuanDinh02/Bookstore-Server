@@ -803,10 +803,39 @@ const getBooksByPublisher = async (publisher_id, book_limit, page) => {
     }
 }
 
+const getSearchBooks = async (book_name) => {
+    try {
+
+        const books = await db.Book.findAll({
+            where: {
+                name: {
+                    [Op.substring]: `${book_name}`
+                }
+            },
+            attributes: ['id', 'name'],
+            raw: true
+        })
+
+        return {
+            EC: 0,
+            DT: books,
+            EM: 'get searched books successfully'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
 module.exports = {
     getABook, getBooksByBookCategory, getBooksByBookCategoryGroup, getBookDetail,
 
     getBooksWithPagination, postCreateNewBook, putUpdateBook,
     deleteBook, putUpdateSellingBook, getSellingBook, getBooksByAuthor,
-    getBooksByPublisher
+    getBooksByPublisher, getSearchBooks
 }
