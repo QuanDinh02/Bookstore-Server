@@ -33,6 +33,7 @@ const initApiRoute = (app) => {
     router.get('/publisher/books',bookController.handleGetBooksByPublisher);
 
     router.get('/search/books',bookController.handleGetSearchBooks);
+    router.get('/admin-search-book',bookController.handleGetSearchBookAdmin);
 
     router.get('/book-category/group',bookCategoryGroupController.handleGetAllGroup);
     router.get('/book-category/group/:id',bookCategoryGroupController.handleGetAGroup);

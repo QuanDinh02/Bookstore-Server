@@ -171,6 +171,28 @@ const handleDeleteBook = async (req, res) => {
     }
 }
 
+const handleGetSearchBookAdmin = async (req, res) => {
+    try {
+        let { limit, page, name } = req.query;
+
+        let result = await bookServices.getSearchBookAdmin(+limit, +page, name);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 //------------------------CUSTOMER VIEW-----------------------------
 
 const handleGetABook = async (req, res) => {
@@ -335,5 +357,5 @@ module.exports = {
     handlePutUpdateSellingBook, handleGetSellingBook,
     handleGetBooksByAuthor, handleGetBooksByPublisher,
 
-    handleGetSearchBooks
+    handleGetSearchBooks, handleGetSearchBookAdmin
 }

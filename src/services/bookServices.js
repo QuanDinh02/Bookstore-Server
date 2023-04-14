@@ -812,6 +812,7 @@ const getSearchBooks = async (book_name) => {
                     [Op.substring]: `${book_name}`
                 }
             },
+            limit: 25,
             attributes: ['id', 'name'],
             raw: true
         })
@@ -832,10 +833,77 @@ const getSearchBooks = async (book_name) => {
     }
 }
 
+const getSearchBookAdmin = async (limit, page, book_name) => {
+    try {
+        if (limit !== 0) {
+            let offSet = (page - 1) * limit;
+
+            const { count, rows } = await db.Book.findAndCountAll({
+                where: {
+                    name: {
+                        [Op.substring]: `${book_name}`
+                    }
+                },
+                include: [
+                    { model: db.Author, attributes: ['id', 'name'] },
+                    { model: db.BookCategory, attributes: ['id', 'name'] },
+                    { model: db.Publisher, attributes: ['id', 'name'] },
+                    { model: db.SellingBook, attributes: ['current_price', 'quantity', 'quality', 'status'] }
+                ],
+                attributes: [
+                    'id', 'name', 'description', 'price', 'image',
+                    'size', 'pages', 'volume', 'format', 'rate', 'publishingDay',
+                    'publishingCompany', 'productCode', 'translator', 'language'
+                ],
+                order: [
+                    ['id', 'DESC']
+                ],
+                limit: limit,
+                offset: offSet,
+                nest: true,
+                raw: true
+            });
+
+            let totalPages = Math.ceil(count / limit);
+
+            let buildData = {
+                total_pages: totalPages,
+                books: rows
+            }
+
+            return {
+                EC: 0,
+                DT: buildData,
+                EM: 'get all books successfully'
+            }
+        }
+        else {
+            const result = await db.Book.findAll({
+                attributes: ['id', 'name'],
+                raw: true
+            });
+
+            return {
+                EC: 0,
+                DT: result,
+                EM: 'get all books successfully'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
 module.exports = {
     getABook, getBooksByBookCategory, getBooksByBookCategoryGroup, getBookDetail,
 
     getBooksWithPagination, postCreateNewBook, putUpdateBook,
     deleteBook, putUpdateSellingBook, getSellingBook, getBooksByAuthor,
-    getBooksByPublisher, getSearchBooks
+    getBooksByPublisher, getSearchBooks, getSearchBookAdmin
 }
